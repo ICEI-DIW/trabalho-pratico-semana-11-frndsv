@@ -209,47 +209,58 @@
         document.addEventListener('DOMContentLoaded', loadRecipes);
 
         function loadRecipes() {
-            let divReceitas = document.getElementById('receitas')
-            let loadedPopular = ''
+            fetch('receitas')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Erro ao carregar receitas.");
+                    }
+                    return response.json();
+                })
+                .then(receitas => {
+                    let divReceitas = document.getElementById('receitas');
+                    let loadedPopular = '';
 
-            for (let i = 0; i < 3 && i < receitas.length; i++) {
-                let receita = receitas[i]
-                loadedPopular += `
-                    <article class="popular">
-                        <div class="image-container"> 
-                            <img class="recipe-image" src="${receita.imagem}" alt="${receita.titulo}">
-                        </div>
-                        <div class="recipe-desc">
-                            <h4>${receita.titulo}</h4>
-                            <h6>${receita.categoria}</h6>
-                            <p>${receita.descricao}</p>
-                            <button value="${receita.id}" class="go-page"> <a href="details.html?id=${receita.id}"> VER RECEITA </a></button>
-                        </div>
-                    </article>
-                    `;
-            }
+                    for (let i = 0; i < 3 && i < receitas.length; i++) {
+                        let receita = receitas[i];
+                        loadedPopular += `
+                            <article class="popular">
+                                <div class="image-container"> 
+                                    <img class="recipe-image" src="${receita.imagem}" alt="${receita.titulo}">
+                                </div>
+                                <div class="recipe-desc">
+                                    <h4>${receita.titulo}</h4>
+                                    <h6>${receita.categoria}</h6>
+                                    <p>${receita.descricao}</p>
+                                    <button value="${receita.id}" class="go-page">
+                                        <a href="details.html?id=${receita.id}">VER RECEITA</a>
+                                    </button>
+                                </div>
+                            </article>`;
+                    }
 
-            divReceitas.innerHTML += loadedPopular;
+                    divReceitas.innerHTML = loadedPopular;
 
-            let divFavorites = document.getElementById('favorites')
-            let loadedFavorites = ''
+                    let divFavorites = document.getElementById('favorites');
+                    let loadedFavorites = '';
+                    let favorites = receitas.slice(2, 10);
 
-            let favorites = receitas.slice(2, 10)
+                    for (let i = 0; i < 8 && i < favorites.length; i++) {
+                        let favorite = favorites[i];
+                        loadedFavorites += `
+                            <div class="favorite">
+                                <img class="favorite-img" src="${favorite.imagem}" alt="${favorite.titulo}">
+                                <div class="favorite-desc">
+                                    <h6>${favorite.titulo}</h6>
+                                    <h6 class="favorite-category">${favorite.categoria}</h6>
+                                </div>
+                            </div>`;
+                    }
 
-            for (let i = 0; i < 8 && i < favorites.length; i++) {
-                let favorite = favorites[i]
-                loadedFavorites += `
-                <div class="favorite">
-                    <img class="favorite-img" src="${favorite.imagem}"  alt="${favorite.titulo}">
-                    <div class="favorite-desc">
-                        <h6> ${favorite.titulo} </h6>
-                        <h6 class="favorite-category"> ${favorite.categoria} </h6>
-                    </div>
-                </div>
-                `;
-            }
-
-            divFavorites.innerHTML += loadedFavorites;
+                    divFavorites.innerHTML = loadedFavorites;
+                })
+                .catch(error => {
+                    console.error("Erro ao carregar receitas:", error);
+                });
         }
     </script>
 

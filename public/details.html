@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Quicksand:wght@300..700&family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Quicksand:wght@300..700&family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="css/details.css">
     <title> Detalhes da receita</title>
@@ -24,8 +24,6 @@
             <li> <a href=""> Pratos principais </a> </li>
             <li> <a href=""> Sobremesas  </a> </li>
             <li> <a href=""> Perfil  </a> </li>
-            
-            
         </ul>
     </nav>
 
@@ -39,18 +37,7 @@
         </ul>
     </div>
 
-
-
-
-    <div id="details" class="recipe-details">
-        
-
-
-        
-    </div>
-
-    
-
+    <div id="details" class="recipe-details"></div>
 
     <script>
         function myFunction() {
@@ -61,85 +48,82 @@
             menu.style.display = "block";
           }
         }
-    </script>
 
-    <script>
+        // Pega o ID da receita na URL
         let params = new URLSearchParams(location.search)
         let id = params.get('id')
         let tela = document.getElementById('details')
-        let images = document.getElementById('more-images')
-        receita = receitas.find(function (elem) {
-            return elem.id == id
-        })
 
 
+        fetch(`receitas/${id}`) 
+            .then(response => response.json())
+            .then(receita => {
+                if (receita) {
+                    tela.innerHTML = `
+                    <div class="details"> 
+                        <div class="recipe-main">
+                            <div class="recipe-title"> 
+                                <img src="${receita.imagem}" alt="${receita.titulo}"> 
+                                <div class="recipe-desc">
+                                    <h1> ${receita.titulo} </h1> 
+                                    <h4> Tempo de preparo: ${receita.tempo} </h4> 
+                                </div>       
+                            </div>
+                        </div>
 
-        if(receita) {
-            tela.innerHTML += `<div class="details"> 
-            <div class="recipe-main">
-                <div class="recipe-title"> 
-                    <img src="${receita.imagem}"> </img>
-                    <div class="recipe-desc">
-                        <h1> ${receita.titulo} </h1> 
-                        <h4> Tempo de preparo: ${receita.tempo} </h4> 
-                    </div>       
-                </div>
-            </div>
+                        <div class="general-details">
+                            <div class="ingredients">
+                                <div class="title">
+                                    <h1> Ingredientes </h1>
+                                </div>
+                                <ol class="ingredients-list" id="lista-ingredientes"></ol>
+                            </div>
 
-            <div class="general-details">
-                <div class="ingredients">
-                    <div class="title">
-                        <h1> Ingredientes </h1>
-                    </div>
-                    <ol class="ingredients-list" id="lista-ingredientes"></ol>
-                </div>
+                            <div class="instructions">
+                                <div class="title">
+                                    <h1>Modo de Preparo</h1>
+                                </div>
+                                <ol class="instructions-list" id="lista-instrucoes"></ol>
+                            </div>
 
-                <div class="instructions">
-                    <div class="title">
-                        <h1>Modo de Preparo</h1>
-                    </div>
-                    <ol class="instructions-list" id="lista-instrucoes"></ol>
-                </div>
+                            <div id="more-images" class="more-images"></div>
+                        </div>
+                    </div>`;
 
-                <div id="more-images" class="more-images">
 
-                </div>
-            </div>
-        </div>`;
+                    let listaIngredientes = document.getElementById("lista-ingredientes");
+                    receita.ingredientes.forEach(ing => {
+                        let li = document.createElement("li");
+                        li.textContent = `${ing.quantidade} de ${ing.nome}`;
+                        listaIngredientes.appendChild(li);
+                    });
 
-        // Preencher ingredientes
-        let listaIngredientes = document.getElementById("lista-ingredientes");
-        receita.ingredientes.forEach(ing => {
-            let li = document.createElement("li");
-            li.textContent = `${ing.quantidade} de ${ing.nome}`;
-            listaIngredientes.appendChild(li);
-        });
 
-        // Preencher instruções
-        let listaInstrucoes = document.getElementById("lista-instrucoes");
-        receita.modo_de_preparo.forEach(passo => {
-            let li = document.createElement("li");
-            li.textContent = passo;
-            listaInstrucoes.appendChild(li);
-        });
+                    let listaInstrucoes = document.getElementById("lista-instrucoes");
+                    receita.modo_de_preparo.forEach(passo => {
+                        let li = document.createElement("li");
+                        li.textContent = passo;
+                        listaInstrucoes.appendChild(li);
+                    });
 
-        // Preencher imagens
+                    let listaImagens = document.getElementById("more-images");
+                    receita.imagens_complementares.forEach(imagem => {
+                        listaImagens.innerHTML += `
+                            <div class="imagem-item">
+                                <img src="${imagem.src}" alt="${imagem.descricao}">
+                            </div>
+                        `;
+                    });
 
-        let listaImagens = document.getElementById("more-images");
-        receita.imagens_complementares.forEach(imagem => {
-            listaImagens.innerHTML += `
-                <div class="imagem-item">
-                    <img src="${imagem.src}" alt="${imagem.descricao}">
-                </div>
-            `;
-        });
-
-        } else {
-            tela.innerHTML += `<h1> Receita não encontrada :( </h1>`
-        }
-
-      
-    </script> 
+                } else {
+                    tela.innerHTML = `<h1> Receita não encontrada :( </h1>`;
+                }
+            })
+            .catch(error => {
+                tela.innerHTML = `<h1> Erro ao carregar a receita :( </h1>`;
+                console.error("Erro ao buscar receita:", error);
+            });
+    </script>
     
 </body>
 </html>
